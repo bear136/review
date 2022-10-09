@@ -4,7 +4,7 @@
 
 只有一个页面的应用，即仅在web页面初始化时加载响应的html、css、js文件
 
-#### 优点 ： 
+#### 优点：
 
 - 用户体验好，内容的改变不需要重新加载，避免了不必要的跳转和重复渲染，对**服务器压力小**
 - 前后端分离
@@ -52,7 +52,7 @@ vue模板编译也就是将`<template> </template>`  模板编译生成渲染函
 
 3. 是使用 element ASTs 生成 render 函数代码字符串
 
-<img src="D:\桌面\前端复习（自己总结）\static\template_render.webp" style="zoom:50%;" />
+<img src=".\static\template_render.webp" style="zoom:50%;" />
 
 ## Vue2响应式原理
 
@@ -115,7 +115,7 @@ function defineReactive (target, key, value) {
 - 在初始化流程中的编译阶段，当`render function` 被渲染的时候，会读取Vue实例中和视图相关的响应式数据，此时会触发 `getter` 函数进行 **依赖收集**（将观察者`Watcher`对象存放到当前闭包的订阅者`Dep`的`subs`中），此时的数据劫持功能和观察者模式就实现了一个MVVM模式中的Binder，之后就是正常的渲染和更新流程。
 - 当数据发生变化或者视图导致的数据发生变化时，会触发数据劫持的`setter`函数，`setter`会通知初始化依赖收集中的`Dep`中和视图相应的 `Watcher` ，告知需要重新渲染视图，`Watcher` 就会再次通过 `update` 方法来更新视图。
 
-<img src="D:\桌面\前端复习（自己总结）\static\vueObserver.webp" style="zoom:50%;" />
+<img src=".\static\vueObserver.webp" style="zoom:50%;" />
 
 ### Vue2检测数组响应式
 
@@ -254,7 +254,7 @@ function trigger (target, key) {
 
 3. updateChildren方法判断子节点（首尾指针法）
 
-   ![](D:\桌面\前端复习（自己总结）\static\patchOldAndNewNode.webp)
+   ![](.\static\patchOldAndNewNode.webp)
 
    1、`oldS 和 newS `使用`sameVnode方法`进行比较，`sameVnode(oldS, newS)`
 

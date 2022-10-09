@@ -90,7 +90,7 @@ const isXType = (x,type) => x.constructor.toString().indexOf(type) > -1
 5. 判断其中一方是否为 `boolean`，是的话就会把 `boolean` 转为 `number` 再进行判断
 6. 判断其中一方是否为 `object` 且另一方为 `string`、`number` 或者 `symbol`，是的话就会把 `object` 转为原始类型再进行判断
 
-![](D:\桌面\前端复习（自己总结）\static\==类型转换.png)
+![](.\static\==类型转换.png)
 
 ## 数组 Array
 
@@ -503,7 +503,7 @@ function debounce (fn, delay = 1000) {
 
 原型对象被创建出来后，会自动生成一个constructor
 
-![](D:\桌面\前端复习（自己总结）\static\proto.webp)
+![](.\static\proto.webp)
 
 
 
@@ -511,7 +511,7 @@ function debounce (fn, delay = 1000) {
 
 每个实例对象（object）都有一个私有属性（称之为 __proto__ ）指向它的构造函数的原型对象（**prototype**）。该原型对象也有一个自己的原型对象（__proto__），层层向上直到一个对象的原型对象为 `null`,这种由__propto__ 连接起来的链式结构，被称为**原型链**
 
-![](D:\桌面\前端复习（自己总结）\static\prototype.webp)
+![](.\static\prototype.webp)
 
 #### 继承
 
@@ -703,7 +703,7 @@ Node的一次Tick分为以下阶段：
 - **检测：check** setImmediate() 会在此阶段调用
 - **关闭的回调函数** 关闭回调，例如： socket.on('close', ...)
 
-![](D:\桌面\前端复习（自己总结）\static\node_loop.png)
+![](.\static\node_loop.png)
 
 ##### 宏任务：
 
