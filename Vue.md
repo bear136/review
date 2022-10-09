@@ -254,7 +254,7 @@ function trigger (target, key) {
 
 3. updateChildren方法判断子节点（首尾指针法）
 
-   ![](.\static\patchOldAndNewNode.webp)
+   <img src='.\static\patchOldAndNewNode.webp'/>
 
    1、`oldS 和 newS `使用`sameVnode方法`进行比较，`sameVnode(oldS, newS)`
 
