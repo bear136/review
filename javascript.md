@@ -719,7 +719,7 @@ Promise的then回调  、process.nextTick、queueMicrotask
   1. next tick queue : process.nextTick 
   2. other queue ：Promise.then()  、 queueMicrotask 
 - 宏任务队列
-  1. timer queue ：setTimeout 、 setTnterval 
+  1. timer queue ：setTimeout 、 setInterval 
   2. poll queue :IO事件
   3. check queue : setImmediate
   4. close queue ；close事件
