@@ -1,3 +1,9 @@
+## MVVM的理解
+
+- Model：模型层，负责处理业务逻辑以及和服务器端进行交互
+- View：视图层：负责将数据模型转化为UI展示出来，可以简单的理解为HTML页面
+- ViewModel：视图模型层，用来连接Model和View，是Model和View之间的通信桥梁
+
 ## 什么是SPA？如何进行seo优化？
 
 ### SPA 单页面应用
@@ -41,16 +47,16 @@
 
 vue模板编译也就是将`<template> </template>`  模板编译生成渲染函数
 
-1. 将模板字符串 编译生成 element ASTs（抽象语法树）
+1. **解析器：**将模板字符串 编译生成 element ASTs（抽象语法树）
 
-2. 对AST进行静态节点标记，主要是用于虚拟DOM的渲染优化
+2. **优化器：**对AST进行静态节点标记，主要是用于虚拟DOM的渲染优化
 
    **优化：**
 
    - 生成虚拟dom的过程中，如果发现一个节点是静态子树，除了首次渲染外不会生成新的子节点树，而是拷贝已存在的静态子树；
    - 比对虚拟dom的过程中，如果发现当前节点是静态子树，则直接跳过，不需要进行比对。
 
-3. 是使用 element ASTs 生成 render 函数代码字符串
+3. **代码生成器： **使用 element ASTs 生成 render 函数代码
 
 <img src=".\static\template_render.webp" style="zoom:50%;" />
 
@@ -256,19 +262,24 @@ function trigger (target, key) {
 
    <img src='.\static\patchOldAndNewNode.webp'/>
 
-   1、`oldS 和 newS `使用`sameVnode方法`进行比较，`sameVnode(oldS, newS)`
+   1、`oldS 和 newS `使用`sameVnode方法`进行比较，`sameVnode(oldS, newS)`  相同则将旧节点移到新节点的位置
 
-   2、`oldS 和 newE `使用`sameVnode方法`进行比较，`sameVnode(oldS, newE)`
+   2、`oldS 和 newE `使用`sameVnode方法`进行比较，`sameVnode(oldS, newE)`  相同则将旧节点移到新节点的位置
 
-   3、`oldE 和 newS `使用`sameVnode方法`进行比较，`sameVnode(oldE, newS)`
+   3、`oldE 和 newS `使用`sameVnode方法`进行比较，`sameVnode(oldE, newS)`  相同则将旧节点移到新节点的位置
 
-   4、`oldE 和 newE `使用`sameVnode方法`进行比较，`sameVnode(oldE, newE)`
+   4、`oldE 和 newE `使用`sameVnode方法`进行比较，`sameVnode(oldE, newE)`  相同则将旧节点移到新节点的位置
 
-   5、如果以上逻辑都匹配不到，再把所有旧子节点的 `key` 做一个映射到旧节点下标的 `key -> index` 表，然后用新 `vnode` 的 `key` 去找出在旧节点中可以复用的位置。
+   5、如果不属于以上四种情况，进行循环patch
+   
+   - 循环newChildren 列表 ，如果在旧节点中找到了当前循环的新节点，如果相等则直接更新并且移动（**总是移动未为查找的节点前**）
+   - 如果找不到，就创建节点插到正确的位置
 
 ### 二、vue3中的diff算法 （快速diff算法）
 
 [](https://juejin.cn/post/7119428616391229471)
+
+**vue3在进行patch中使用了patchFlag 进行优化，即会根据节点的特点打上特定的patchFlag , patch是就只用比较patchFlag，减少遍历次数**
 
 - #### 没有key时 patchUnkeydChildren
 
@@ -292,28 +303,17 @@ function trigger (target, key) {
 
   5. **新序列中有多余，旧序列中也有剩余**
 
-     - 为新的子节点构建key：index映射     ---> 作用：后面遍历旧节点后可以知道可复用的节点在新序列中的位置
+     - 为新的子节点构建key：index映射 ---> 作用：后面遍历旧节点后可以知道可复用的节点在新序列中的位置**（最大递增序列的算法）**
 
-     - 从左向右遍历旧序列，patch相同的节点，卸载不存在的旧节点
+     - 移除新节点队列中不存在的旧节点并更新复用节点
+- 处理新增节点和移动的节点
 
-       变量`newIndexToOldIndexMap`用于映射**新的子序列中的节点下标** 对应于 **旧的子序列中的节点的下标**
-
-       并且会将`newIndexToOldIndexMap`初始化为一个全0数组，`[0, 0, 0, 0]`
-       通过newIndex初始化`newIndexToOldIndexMap`
-
-     - 移动可复用的节点，挂载新增的节点
-
-       前面通过`newIndexToOldIndexMap`，记录了新旧子节点变化前后的下标映射。
-
-       这里会通过`getSequence`方法获取一个**最大递增子序列**。用于记录相对位置没有发生变化的子节点的下标。
-
-       
 
 ## v-for中的key的作用
 
 - key 的作用主要是为了更高效的更新虚拟 DOM，因为它可以非常精确的找到相同节点，因此 patch 过程会非常高效
 
-- Vue 在 patch 过程中会判断两个节点是不是相同节点时，key 是一个必要条件。比如渲染列表时，如果不写 key，Vue 在比较的时候，就可能会导致频繁更新元素，使整个 patch 过程比较低效，影响性能
+- Vue 在 patch 过程中会判断两个节点是不是相同节点时，key 是一个必要条件。比如渲染列表时，如果不写 key，Vue 在比较的时候，就可能会导致频繁更新元素，使整个 patch 过程比较低效，影响性能你 
 
 - 应该避免使用数组下标作为 key，因为 key 值不是唯一的话可能会导致数组插入时，插入位置后的元素都会被重新渲染，使 Vue 无法区分它他，还有比如在使用相同标签元素过渡切换的时候，就会导致只替换其内部属性而不会触发过渡效果
 
@@ -498,23 +498,27 @@ console.log(this.data)  //父组件的所有属性
 
 ## Vue双向绑定的原理
 
-- new Vue()初始化，对data执行响应化处理，在observer函数中劫持监听所有属性
+​	Vue数据双向绑定的原理是通过**数据劫持结合发布者-订阅者模式**来实现的
 
-- 同时对模板执行编译，找到其中动态绑定的数据，从`data`中获取并初始化视图，这个过程发生在`Compile`中
+- 在初始化，对data执行响应化处理，在observer函数中劫持监听所有属性，并为每个属性添加一个Dep数组
 
-- 同时定义⼀个更新函数和`Watcher`，将来对应数据变化时`Watcher`会调用更新函数
+- 当get执行时，会为调用的dom节点创建一个watcher存放到该数组中，当set执行时，调用Dep数组的notify方法通知
 
-- 由于`data`的某个`key`在⼀个视图中可能出现多次，所以每个`key`都需要⼀个管家`Dep`来管理多个`Watcher`
+  所有使用了该属性的watcher，调用watcher的updater方法触发Compile的回调，更新视图
 
-- 将来data中数据⼀旦发生变化，会首先找到对应的`Dep`，通知所有`Watcher`执行更新函数
+- 在Compile解析过程中，此时会调用get方法，我们在触发get时创建一个watcher对象，该对象在初始化时，**为Dep添加一个**
 
-  ![img](https://static.vue-js.com/e5369850-3ac9-11eb-85f6-6fac77c0c9b3.png)
+  **静态属性target，为该DOM节点的值**。此时调用CompilerUtil.getValue，获取该data的当前值，这时就会触发getter，将watcher存入Dep中，获得属性的值然后更更新视图，最后将Dep.target设置为空，。因为它是全局变量，也是watcher与dep关联的唯一桥梁，任何时刻都必须保证`Dep.target`只有一个值。
+
+
+
+![img](https://static.vue-js.com/e5369850-3ac9-11eb-85f6-6fac77c0c9b3.png)
 
 利用proxy或者object.defineproperty生成的observer劫持监听所有的属性，在属性变化后通知dep订阅者。同时compile解析指令，收集指令所依赖的方法和数据,等待数据变化然后进行渲染，将来data中数据⼀旦发生变化，会首先找到对应的`Dep`，触发setter通知之前的所有`Watcher`执行更新函数，告知视图更新，重新渲染页面
 
 ## Vue.nextTick() 原理
 
-将回调函数延迟在下一次DOM更新数据后调用，简单的理解就是：当数据更新了，在DOM中渲染后，自动执行该函数
+**在下次 DOM 更新循环结束之后执行延迟回调**。在修改数据之后立即使用这个方法，获取更新后的 DOM，
 
 Vue在修改数据后，视图不会立即更新，二是等到同一事件循环中的所有数据都变化完成后，在进行同一的视图更新
 
@@ -541,6 +545,36 @@ vue是异步执行dom更新的，一旦观察到数据变化，vue就会开启�
 - computed 支持缓存，只有依赖的数据发生变化时，才会重新计算，而watch不支持缓存，数据变则会执行响应的回调函数
 - computed不支持异步，当computed内有异步操作时是无法监听数据变化的；watch支持异步操作
 - computed属性的属性值是一函数，函数返回值为属性的属性值，computed中每个属性都可以设置set与get方法。watch监听的数据必须是data中声明过或父组件传递过来的props中的数据，当数据变化时，触发监听器
+
+**computed实现原理：**
+
+```vue
+<script>
+	data(){
+	return {
+        a:1,
+        b:1
+	}
+}
+conputed:{
+	num(){
+		return this.a+this.b
+    }
+}
+</script>
+```
+
+当我们使用computed时，**会遍历我们的computed对象，将每一个值都定义一个Wathcer实例**，**并且其中的每一个watcher实例都有一个dirty属性，当dirty为false时，使用缓存的结果，当变为true后调用evaluate重新计算**
+
+即计算属性重新求值的过程：
+
+- 改变依赖值 --> 触发set --> 触发dep.notify --> watcher.update --> 是计算watcher --> this.dirty = true --> 当dirty为true时，调用evaluate重新求值。
+- 改变试图 ：将渲染watcher放入Dep依赖池中
+
+**watch实现原理：**
+
+- 首先watch在初始化时，会读取一边监听的数据的值，此时那个数据就收集到了watch的watcher中了
+- 当watch进行了更新，回调函数就会被调用，将新值和旧的值都进行了传递
 
 ## vue-router
 
@@ -578,7 +612,7 @@ vue是异步执行dom更新的，一旦观察到数据变化，vue就会开启�
 
 **区别：**
 
-​	hash模式中修改的是#中的信息，浏览器请求不会讲#之后的数据发送到后台，但是在history模式下，可以自由修改path，当刷新时，如果服务器没有响应的相	应或者资源，则会刷新出来404页面
+​	hash模式中修改的是#中的信息，浏览器请求不会讲#之后的数据发送到后台，但是在history模式下，可以自由修改path，当刷新时，如果服务器没有响应的相应或者资源，则会刷新出来404页面
 
 ### keep-alive的原理
 
@@ -604,9 +638,9 @@ keep-alive在各个生命周期
 
 第二步：判断此`组件名称`是否能被`白名单、黑名单`匹配，如果`不能被白名单匹配 || 能被黑名单匹配`，则直接返回`VNode`，不往下执行，如果不符合，则往下执行`第三步`
 
-第三步：根据`组件ID、tag`生成`缓存key`，并在缓存集合中查找是否已缓存过此组件。如果已缓存过，直接取出缓存组件，并更新`缓存key`在`keys`中的位置（这是`LRU算法`的关键），如果没缓存过，则继续`第四步`
+第三步：根据`组件ID、tag`生成`缓存key`，并在缓存集合中查找是否已缓存过此组件。如果已缓存过，直接取出缓存组件，并更新`缓存key`在`keys`中的位置，**从原来的地方删除重新放到this.keys的最后一个**，如果没缓存过，则继续`第四步`
 
-第四步：分别在`cache、keys`中保存`此组件`以及他的`缓存key`，并检查数量是否超过`max`，超过则根据`LRU算法`进行删除
+第四步：分别在`cache、keys`中保存`此组件`以及他的`缓存key`，并检查数量是否超过`max`，超过则将this.keys的第一个进行删除
 
 第五步：将此组件实例的`keepAlive`属性设置为true
 
@@ -684,3 +718,62 @@ const store = new Store(Vue, {
 })
 ```
 
+## npm run xxx 发生了什么
+
+npm run xxx 会首先再package.json文件中找 **scripts** 里找对应的 xxx
+
+```json
+'sctipts':{
+	'serve' : 'vue-cli-service serve'	
+}
+```
+
+ npm run serve 就相当于执行了  vue-cli-service serve 这个指令，但是由于系统中不存在该指令则会执行一下步骤
+
+1. 首先npm i xxx 安装依赖时，会在 **node_modules/.bin/** 下创建一个个 xxx的脚本文件
+2. 当执行 vue-cli-service serve  时 ，npm 回到  node_modules/.bin/  路径下找到 vue-cli-service 文件执行该脚本，相当于执行了 **./node_modules/.bin/vue-cli-service serve**
+
+3. 该bin目录下的软连接的实现： npm i 时 npm 读到该配置后，就将该文件软链接到 ./node_modules/.bin 目录下，而 npm 还会自动把node_modules/.bin加入$PATH，这样就可以直接作为命令运行依赖程序和开发依赖程序
+
+总结：
+
+npm i 的时候，npm 就帮我们把这种软连接配置好了，其实这种软连接相当于一种映射，执行npm run xxx 的时候，就会到 node_modules/bin中找对应的映射文件，然后再找到相应的js文件来执行。
+
+1. 运行 npm run xxx的时候，npm 会先在当前目录的 node_modules/.bin 查找要执行的程序，如果找到则运行；
+
+2. 没有找到则从全局的 node_modules/.bin 中查找，npm i -g xxx就是安装到到全局目录；
+
+3. 如果全局目录还是没找到，那么就从 path 环境变量中查找有没有其他同名的可执行程序。
+
+## 首页加载白屏
+
+#### 造成白屏的原因
+
+- 网络延迟
+- 资源文件体积过大
+- 加载脚本时，渲染内容堵塞
+
+#### 白屏时间、首屏时间
+
+白屏时间：**FP**：first paint 。指浏览器从响应用户输入网络地址，到浏览器开始显示内容的时间
+
+首屏时间： **FCP:** 指浏览器从响应用户输入网络地址，到首屏内容渲染完成的时间
+
+有效绘制时间：**FMP：** ajax请求数据之后，首次有效绘制。
+
+#### 解决方案
+
+1. **预渲染**
+
+   webpack打包时渲染，通过无头浏览器
+
+   无头浏览器,打包的时候，可以把你index.html的内容放入你这个浏览器，但是你这个浏览器是空白的，然后当你进入页面时候直接加载这个index.html，但是没ajax请求
+
+2. **同构：** 一套代码多端使用
+
+3. **SSR 服务端渲染** 在服务端首先准备好首页所需要的html文件
+
+4. **路由懒加载** 
+
+5. **gzip压缩，加速:** 启动gzip压缩可大幅度缩减传输资源大小，从而缩短资源下载的时间，减少首次白屏时间，提高用户体验。
+6. **首页加 loading 或者骨架屏 （优化体验）**  
