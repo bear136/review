@@ -39,7 +39,7 @@
 
   **注意：** 其中有两个特殊类型： undefined的值是(-2)的30次方  null 是NULL机器码 0-31位均为0 所以typeof null 是Object
 
-  - **instanceof**   用于区分引用数据类型，不能检测基本数据类型
+- **instanceof**   用于区分引用数据类型，不能检测基本数据类型
 
 > object instanceof constructor     用来比较一个对象的是否为某一个构造函数的实例 
 
