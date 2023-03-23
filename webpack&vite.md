@@ -6,12 +6,12 @@
 
 ## 二、webpack 配置
 
--   entry ：入口
--   output：出口
--   loader: 用于**对模块源码的转换，**loader 描述了 webpack 如何处理非 javascript 模块，并且在 build 中引入这些依赖。loader 可以将文件从不同的语言（如 TypeScript）转换为 JavaScript，或者将内联图像转换为 data URL
--   plugins : 定义需要用的插件 。 目的在于解决 loader 无法实现的其他事，从打包优化和压缩，到重新定义环境变量，功能强大到可以用来处理各种各样的任务
--   mode ： 定义开发环境和生产环境
--   module： 决定结果和处理项目中不同类型的模块
+- entry ： 入口
+- output：出口
+- loader: 用于**对模块源码的转换，**loader描述了webpack如何处理非javascript模块，并且在build中引入这些依赖。loader可以将文件从不同的语言（如TypeScript）转换为JavaScript，或者将内联图像转换为data URL
+- plugins : 定义需要用的插件 。 目的在于解决loader无法实现的其他事，从打包优化和压缩，到重新定义环境变量，功能强大到可以用来处理各种各样的任务
+- mode ： 定义开发环境和生产环境
+- module： 决定结果和处理项目中不同类型的模块
 
 ## 三、webpack 的打包过程
 
@@ -25,7 +25,7 @@
 
 在以上过程中，`Webpack` 会在特定的时间点广播出特定的事件，插件在监听到感兴趣的事件后会执行特定的逻辑，并且插件可以调用 Webpack 提供的 API 改变 Webpack 的运行结果。
 
-简单说
+简单说:
 
 -   初始化：启动构建，读取与合并配置参数，加载 Plugin，实例化 Compiler
 -   编译：从 Entry 出发，针对每个 Module 串行调用对应的 Loader 去翻译文件的内容，再找到该 Module 依赖的 Module，递归地进行编译处理
@@ -109,41 +109,40 @@
 
 **Loader** 本质上是一个函数，在该函数中对接收到的内容进行转换，返回转换后的结果，即对其他类型的资源进行预处理。
 
-**Loader：** 在 module.rules 中进行配置，作为类型的解析规则，类型为数组。每一项都是 Object，包括了 test(类型文件) 、loader、options 等属性
+**Loader：** 在module.rules中进行配置，作为类型的解析规则，类型为数组。每一项都是Object，包括了test(类型文件) 、loader、options等属性
 
-**Plugin** 就是插件，基于事件流框架，可以拓展 webpack 功能。在 webpack 运行周期内会广播许多事件，Plugin 可以监听这些事件，再合适的时机通过 webpack 提供的 api 修改输出结果
+**Plugin** 就是插件，基于事件流框架，可以拓展webpack功能。在webpack运行周期内会广播许多事件，Plugin可以监听这些事件，再合适的时机通过webpack提供的api修改输出结果
 
 **plugin** 在plugins中单独配置，类型为数组，每一项都是一个plugin的实例，参数通过构造函数传入
 
 ## 七、使用webpack开发时，你用过哪些可以提高效率的插件？
 
-## 七、使用 webpack 开发时，你用过哪些可以提高效率的插件？
+- **webpack-dashboard :** 可以更好的展示相关打包信息
 
--   **webpack-dashboard :** 可以更好的展示相关打包信息
+- **webpack-merge:** 提取公共配置，减少重复代码
 
--   **webpack-merge:** 提取公共配置，减少重复代码
+- **speed-measure-webpack-plugin**：简称 SMP，分析出 Webpack 打包过程中 Loader 和 Plugin 的耗时，有助于找到构建过程中的性能瓶颈。
 
--   **speed-measure-webpack-plugin**：简称 SMP，分析出 Webpack 打包过程中 Loader 和 Plugin 的耗时，有助于找到构建过程中的性能瓶颈。
+- **size-plugin**：监控资源体积变化，尽早发现问题
 
--   **size-plugin**：监控资源体积变化，尽早发现问题
+- **HotModuleReplacementPlugin**：模块热替换
 
--   **HotModuleReplacementPlugin**：模块热替换
 
-## 八、webpack 热更新原理
+## 八、webpack热更新原理
 
-webpack 的热更新也叫做热替换 （Hot Module Replacement） 简称 HMR 。 这个机制可以做到不用刷新浏览器而更将新变更的模块替换掉旧的模块
+webpack的热更新也叫做热替换 （Hot Module Replacement） 简称 HMR 。 这个机制可以做到不用刷新浏览器而更将新变更的模块替换掉旧的模块
 
-**wds：基于 node.js 的使用了 express 的 http 服务器**
+**wds：基于node.js的使用了express的http服务器**
 
-客户端从服务端拉取更新后的文件，就是代码块需要更新的那部分，实际上 wds 与浏览器之间维护了一个**websocket**，当本地资源发生变化时，wds 会向浏览器推送更新，并且**带上构建时的 hash**，让客户端与上一次资源进行比对，客户端对比出差异后**会向 wds 发起 ajax 请求来获取更改内容（文件内容，hash）**，这样客户端就可以**借助这些信息继续向 wds 发起 jsonp 请求来获取 chunk 的增量更新**。后续由 hot module plugin 来完成后续工作，比如拿到增量更新如何处理，那些状态应该保留，哪些又需要更新；hotmoduleplugin 提供了相关 api 供开发者针对自身场景进行处理。
+客户端从服务端拉取更新后的文件，就是代码块需要更新的那部分，实际上wds与浏览器之间维护了一个**websocket**，当本地资源发生变化时，wds会向浏览器推送更新，并且**带上构建时的hash**，让客户端与上一次资源进行比对，客户端对比出差异后**会向wds发起ajax请求来获取更改内容（文件内容，hash）**，这样客户端就可以**借助这些信息继续向wds发起jsonp请求来获取chunk的增量更新**。后续由hot module plugin来完成后续工作，比如拿到增量更新如何处理，那些状态应该保留，哪些又需要更新；hotmoduleplugin提供了相关api供开发者针对自身场景进行处理。
 
-## 九、babel 的原理
+## 九、babel的原理
 
--   **解析：** 将代码转化成 AST
-    -   词法分析：将代码（字符串）分割正 token 流，即语法单元组成的数组
-    -   语法分析 ： 分析 token 流并生成 AST
--   **转换：** 访问 AST 的节点进行变换操作生成新的 AST
--   **生成：** 以新的 AST 为基础生成代码
+- **解析：** 将代码转化成AST
+  - 词法分析：将代码（字符串）分割正token 流，即语法单元组成的数组
+  - 语法分析 ： 分析token流并生成 AST
+- **转换：** 访问AST的节点进行变换操作生成新的AST
+- **生成：** 以新的AST为基础生成代码
 
 # Vite
 
